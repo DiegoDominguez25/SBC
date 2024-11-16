@@ -1,0 +1,3 @@
+(assert (eliminar InfeccionGarganta))
+(assert (agregarEnfermedad Bronquitis Tos DolorDeGarganta Congestion Cansancio))
+(assert (actualizar Gripe Tos DolorDeGarganta Congestion Cansancio)) 

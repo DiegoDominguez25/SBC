@@ -1,0 +1,36 @@
+(deffacts clients
+	(customer (customer-id 1) (name "Juan Perez") (phone "555-1234"))
+	(customer (customer-id 2) (name "Ana Lopez") (phone "555-5678"))
+	(customer (customer-id 3) (name "Carlos Garcia") (phone "555-9876"))
+	(customer (customer-id 4) (name "Laura Sanchez") (phone nil)) ; Cliente sin teléfono
+	(customer (customer-id 5) (name "Pedro Martinez") (phone "555-1122"))
+)
+
+(deffacts products
+	(product (part-number "P1001") (name "Smartphone XYZ") (category "Smartphone") (price 7000) (marca "XYZ") (model 2021))
+	(product (part-number "P1002") (name "Smartphone ABC") (category "Smartphone") (price 4500) (marca "ABC") (model 2018))
+	(product (part-number "P2001") (name "Protector de Pantalla") (category "Accesorios") (price 300) (marca "XYZ") (model 2021))
+	(product (part-number "P2002") (name "Funda de telefono") (category "Accesorios") (price 150) (marca "XYZ") (model 2017))
+	(product (part-number "P3001") (name "Laptop Gamer") (category "Computadora") (price 18000) (marca "GamerPro") (model 2021))
+	(product (part-number "P3002") (name "Mouse Inalambrico") (category "Accesorios") (price 500) (marca "TechGear") (model 2015))
+)
+
+(deffacts orders
+	(order (order-number "O1001") (customer-id 1) (card "Visa"))
+	(order (order-number "O1002") (customer-id 2) (card "MasterCard"))
+	(order (order-number "O1003") (customer-id 3) (card "BBVA"))
+	(order (order-number "O1004") (customer-id 4) (card "Visa")) ; Pedido de cliente sin teléfono
+	(order (order-number "O1005") (customer-id 5) (card "MasterCard"))
+)
+
+(deffacts items-list
+	(line-item (order-number "O1001") (part-number "P1001") (customer-id 1) (quantity 12))
+	(line-item (order-number "O1001") (part-number "P2001") (customer-id 1) (quantity 1))
+	(line-item (order-number "O1002") (part-number "P1002") (customer-id 2) (quantity 5))
+	(line-item (order-number "O1002") (part-number "P2002") (customer-id 2) (quantity 2))
+	(line-item (order-number "O1003") (part-number "P3001") (customer-id 3) (quantity 11))
+	(line-item (order-number "O1003") (part-number "P2002") (customer-id 3) (quantity 6))
+	(line-item (order-number "O1004") (part-number "P1001") (customer-id 4) (quantity 14))
+	(line-item (order-number "O1005") (part-number "P1002") (customer-id 5) (quantity 8))
+	(line-item (order-number "O1005") (part-number "P2002") (customer-id 5) (quantity 2))
+)

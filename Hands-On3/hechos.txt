@@ -1,0 +1,45 @@
+(deffacts enfermedades
+  (Enfermedad Gripe Fiebre Tos DolorDeGarganta CongestionNasal)
+  (Enfermedad Neumonia TosConFlema FiebreAlta DificultadParaRespirar Escalofrios)
+  (Enfermedad Tuberculosis TosPersistente EsputoConSangre PerdidaDePeso SudoresNocturnos)
+  (Enfermedad Varicela ErupcionCutanea Fiebre DolorDeCabeza PerdidaDeAppetito)
+  (Enfermedad HepatitisA Ictericia DolorAbdominal Nauseas Fatiga)
+)
+
+(defrule corrertodo
+(Enfermedad ?nombre ?s1 ?s2 ?s3 ?s4)
+=>
+(printout t "Enfermedad: " ?nombre "." crlf)
+(printout t "Sintoma 1: " ?s1 "." crlf)
+(printout t "Sintoma 2: " ?s2 "." crlf)
+(printout t "Signo 1: " ?s3 "." crlf)
+(printout t "Signo 2: " ?s4 "." crlf)
+(printout t "------------------------------------" crlf)
+)
+
+(defrule agregarEnfermedadRule
+   (agregarEnfermedad ?nombre ?s1 ?s2 ?s3 ?s4)  ; Hecho de solicitud para agregar una nueva enfermedad
+   =>
+   (assert (Enfermedad ?nombre ?s1 ?s2 ?s3 ?s4))  ; Inserta el hecho de Enfermedad en la base de conocimiento
+   (printout t "Nueva enfermedad agregada: " ?nombre crlf))
+)
+
+(defrule actualizarEnfermedad
+   ?act <- (actualizar ?nombre ?nuevoSintoma1 ?nuevoSintoma2 ?nuevoSigno1 ?nuevoSigno2)
+   ?fact <- (Enfermedad ?nombre ?s1 ?s2 ?s3 ?s4)  ; Encuentra el hecho de enfermedad con el nombre especificado
+   =>
+   (retract ?fact)  ; Elimina el hecho actual de la enfermedad
+   (assert (Enfermedad ?nombre ?nuevoSintoma1 ?nuevoSintoma2 ?nuevoSigno1 ?nuevoSigno2))  ; Inserta el hecho actualizado
+   (retract ?act)  ; Elimina el hecho "actualizar" para evitar el bucle
+   (printout t "Enfermedad actualizada: " ?nombre crlf))
+
+(defrule eliminarEnfermedad
+   ?act <- (eliminar ?nombreEliminar)  ; Encuentra el hecho de "eliminar" con el nombre a eliminar
+   ?fact <- (Enfermedad ?nombre ?s1 ?s2 ?s3 ?s4)  ; Encuentra el hecho de enfermedad con el nombre especificado
+   (test (eq ?nombre ?nombreEliminar))  ; Verifica que el nombre coincida
+   =>
+   (retract ?fact)  ; Elimina el hecho "Enfermedad"
+   (retract ?act)  ; Elimina el hecho "eliminar" para evitar bucles
+   (printout t "Enfermedad eliminada: " ?nombre crlf))  ; Imprime el mensaje de confirmación
+
+

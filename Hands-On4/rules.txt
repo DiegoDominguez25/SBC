@@ -1,0 +1,152 @@
+(defrule cliente-sin-orden
+  (customer (customer-id ?cid) (name ?n))
+  (not (order (customer-id ?cid)))
+  =>
+  (printout t "R-01: El cliente " ?n " no ha realizado ninguna orden." crlf)
+)
+
+(defrule aplicar-descuento-primera-orden
+  (customer (customer-id ?cid) (name ?n))
+  (not (order (customer-id ?cid)))
+  =>
+  (assert (apply-discount ?cid 5))
+  (printout t "R-02: El cliente " ?n " recibe un descuento del 5% en su primera orden." crlf)
+)
+
+(defrule llamar-cliente-descuento
+  ?ld <- (apply-discount ?cid ?d)
+  (customer (customer-id ?cid) (name ?n) (phone ?p))
+  =>
+  (printout t "R-03: Llamando al cliente " ?n " al teléfono " ?p " para ofrecerle un descuento del " ?d "%." crlf)
+  (retract ?ld)
+)
+
+(defrule mostrar-productos-categoria
+  (product (category "Celular") (name ?n) (marca ?m) (price ?p))
+  =>
+  (printout t "R-04: Producto en la categoría Celular: " ?m " " ?n " cuesta $" ?p "." crlf)
+)
+
+(defrule descuento-marca-en-orden
+  (order (order-number ?on) (customer-id ?cid))
+  (line-item (order-number ?on) (part-number ?pn1) (quantity ?q1))
+  (line-item (order-number ?on) (part-number ?pn2) (quantity ?q2))
+  (product (part-number ?pn1) (marca ?m))
+  (product (part-number ?pn2) (marca ?m & : (neq ?pn1 ?pn2)))
+  =>
+  (assert (apply-discount ?cid 10))
+  (printout t "R-05: El cliente " ?cid " recibe un descuento del 10% en la orden " ?on " por tener dos productos de la marca " ?m "." crlf)
+)
+
+(defrule cliente-con-dos-pedidos
+  (customer (customer-id ?cid) (name ?n))
+  (order (customer-id ?cid) (order-number ?on1))
+  (order (customer-id ?cid) (order-number ?on2 & : (neq ?on1 ?on2)))
+  =>
+  (printout t "R-06: El cliente " ?n " ha realizado al menos dos pedidos. Puede ser elegible para una recompensa." crlf)
+)
+
+(defrule descuento-producto-caro
+  (line-item (order-number ?on) (part-number ?pn) (quantity ?q))
+  (product (part-number ?pn) (name ?name) (price ?price & : (> ?price 20000)))
+  =>
+  (printout t "R-07: Producto caro en la orden " ?on ": " ?name " cuesta $" ?price ". Aplicando 10% de descuento." crlf)
+)
+
+(defrule mostrar-productos-economicos
+  (product (price ?price & : (< ?price 10000)) (name ?name) (marca ?marca))
+  =>
+  (printout t "R-08: Producto económico: " ?marca " " ?name " cuesta $" ?price "." crlf)
+)
+
+(defrule descuento-combo-smartphone
+  (order (order-number ?on) (customer-id ?cid))
+  (line-item (order-number ?on) (part-number ?pn1))
+  (line-item (order-number ?on) (part-number ?pn2))
+  (product (part-number ?pn1) (category "Smartphone"))
+  (product (part-number ?pn2) (category "Accessories"))
+  =>
+  (printout t "R-09: Orden " ?on ": Descuento del 15% en accesorios por comprar un smartphone y accesorios juntos." crlf)
+)
+
+(defrule cliente-vip
+  (customer (customer-id ?cid) (name ?n))
+  (order (customer-id ?cid))
+  (line-item (customer-id ?cid) (quantity ?q & : (> ?q 10)))
+  =>
+  (printout t "R-10: El cliente " ?n " es considerado VIP por realizar compras en grandes cantidades." crlf)
+)
+
+(defrule cliente-sin-numero
+  (customer (customer-id ?cid) (name ?n) (phone nil))
+  =>
+  (printout t "R-11: El cliente " ?n " no ha proporcionado un número de teléfono." crlf)
+)
+
+(defrule descuento-producto-modelo-antiguo
+  (product (part-number ?pn) (name ?name) (model ?model & : (< ?model 2020)) (price ?price))
+  =>
+  (printout t "R-12: Descuento del 20% aplicado al producto " ?name " (modelo " ?model ") por ser un modelo anterior." crlf)
+)
+
+(defrule mostrar-ordenes-tarjeta-especifica
+  (order (order-number ?on) (customer-id ?cid) (card "Visa"))
+  (customer (customer-id ?cid) (name ?n))
+  =>
+  (printout t "R-13: El cliente " ?n " hizo el pedido " ?on " con una tarjeta Visa." crlf)
+)
+
+(defrule descuento-por-gran-cantidad
+  (line-item (order-number ?on) (part-number ?pn) (quantity ?q & : (> ?q 5)))
+  (product (part-number ?pn) (name ?name) (price ?price))
+  =>
+  (printout t "R-14: Pedido " ?on ": Descuento del 5% aplicado al producto " ?name " por comprar más de 5 unidades." crlf)
+)
+
+(defrule mostrar-productos-sin-stock
+  (product (part-number ?pn) (name ?name) (price ?price))
+  (not (line-item (part-number ?pn)))
+  =>
+  (printout t "R-15: El producto " ?name " está disponible, pero no ha sido comprado recientemente." crlf)
+)
+
+
+(defrule descuento-mayorista
+  (line-item (order-number ?on) (part-number ?pn) (quantity ?q & : (> ?q 10)))
+  (customer (customer-id ?cid) (name ?n))
+  =>
+  (printout t "R-16: El cliente " ?n " es mayorista y recibe un 15% de descuento por comprar más de 10 unidades de " ?pn "." crlf)
+)
+
+(defrule descuento-menudista
+  (line-item (order-number ?on) (part-number ?pn) (quantity ?q & : (< ?q 10)))
+  (customer (customer-id ?cid) (name ?n))
+  =>
+  (printout t "R-17: El cliente " ?n " es menudista y no recibe descuento por comprar menos de 10 unidades de " ?pn "." crlf)
+)
+
+(defrule descuento-smartphone-2-productos
+  (line-item (order-number ?on) (part-number ?pn1) (quantity ?q1))
+  (line-item (order-number ?on) (part-number ?pn2) (quantity ?q2))
+  (product (part-number ?pn1) (category "Smartphone"))
+  (product (part-number ?pn2) (category "Accessories"))
+  =>
+  (printout t "R-18: Descuento del 10% aplicado en accesorios por comprar un smartphone y un accesorio juntos en la orden " ?on "." crlf)
+)
+
+(defrule descuento-producto-especifico
+  (line-item (order-number ?on) (part-number ?pn) (quantity ?q))
+  (product (part-number ?pn) (price ?price & : (> ?price 5000)))
+  =>
+  (printout t "R-19: Descuento del 5% aplicado al producto de alto precio (más de $5000) con el código de producto " ?pn " en la orden " ?on "." crlf)
+)
+
+(defrule descuento-pedido-total
+  (order (order-number ?on) (customer-id ?cid))
+  (line-item (order-number ?on) (quantity ?q) (part-number ?pn))
+  (product (part-number ?pn) (price ?price))
+  (bind ?total + * ?q ?price ?total)
+  (test (> ?total 30000))
+  =>
+  (printout t "R-20: Descuento del 10% aplicado a la orden " ?on " por un total superior a $30,000." crlf)
+)
